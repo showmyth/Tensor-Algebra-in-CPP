@@ -1,2 +1,2 @@
-# Tensor-Algebra-in-CPP
-going allah mode (respectfully)
+# Tensor-Algebra-in-Rust
+this guy made me change the language YALLAH

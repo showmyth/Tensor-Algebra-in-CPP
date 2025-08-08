@@ -26,3 +26,18 @@ impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Array<T, N> {
         }
     }
 }
+
+impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Matrix<T, N> {
+    pub fn new() -> Self {
+        Array {
+            _array: [T::default(); N],
+        }
+    }
+}
+impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Tensor<T, N> {
+    pub fn new() -> Self {
+        Array {
+            _array: [T::default(); N],
+        }
+    }
+}

@@ -8,3 +8,7 @@ A foundational library for performing basic algebraic operations on N-dimensiona
 
 - **Generic Types:** Works with common numeric types like i32/64, u32/64, or f32/64
 
+## Coming features
+
+- **Arithmetic Operations:** Adding, Subtracting, Dividing, Scalar operations.
+

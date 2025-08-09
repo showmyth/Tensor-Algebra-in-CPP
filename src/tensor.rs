@@ -1,50 +1,405 @@
-pub trait AllowedNumericTypes: Sized {}
+use crate::error::TensorError;
+use std::ops::{Add, Div, Index, IndexMut, Mul, Sub};
 
-impl AllowedNumericTypes for f32 {}
-impl AllowedNumericTypes for f64 {}
-impl AllowedNumericTypes for i32 {}
-impl AllowedNumericTypes for i64 {}
-impl AllowedNumericTypes for u32 {}
-impl AllowedNumericTypes for u64 {}
+pub trait AllowedNumericTypes:
+    Sized
+    + Copy
+    + Default
+    + Add<Output = Self>
+    + Sub<Output = Self>
+    + Mul<Output = Self>
+    + Div<Output = Self>
+    + PartialEq
+    + std::fmt::Debug
+{
+    fn zero() -> Self;
+    fn one() -> Self;
+    fn is_zero(&self) -> bool;
+}
 
+impl AllowedNumericTypes for f32 {
+    fn zero() -> Self {
+        0.0
+    }
+    fn one() -> Self {
+        1.0
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0.0
+    }
+}
+
+impl AllowedNumericTypes for f64 {
+    fn zero() -> Self {
+        0.0
+    }
+    fn one() -> Self {
+        1.0
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0.0
+    }
+}
+
+impl AllowedNumericTypes for i32 {
+    fn zero() -> Self {
+        0
+    }
+    fn one() -> Self {
+        1
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0
+    }
+}
+
+impl AllowedNumericTypes for i64 {
+    fn zero() -> Self {
+        0
+    }
+    fn one() -> Self {
+        1
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0
+    }
+}
+
+impl AllowedNumericTypes for u32 {
+    fn zero() -> Self {
+        0
+    }
+    fn one() -> Self {
+        1
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0
+    }
+}
+
+impl AllowedNumericTypes for u64 {
+    fn zero() -> Self {
+        0
+    }
+    fn one() -> Self {
+        1
+    }
+    fn is_zero(&self) -> bool {
+        *self == 0
+    }
+}
+
+#[derive(Clone, Debug, PartialEq)]
 pub struct Array<T: AllowedNumericTypes, const N: usize> {
-    _array: [T; N],
+    data: [T; N],
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Matrix<T: AllowedNumericTypes, const N: usize> {
-    _matrix: Vec<Array<T, N>>,
+    data: Vec<Array<T, N>>,
+    rows: usize,
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Tensor<T: AllowedNumericTypes, const N: usize> {
-    _tensor: Vec<Matrix<T, N>>,
+    data: Vec<Matrix<T, N>>,
+    depths: usize,
+    rows: usize,
 }
 
-impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Array<T, N> {
+impl<T: AllowedNumericTypes, const N: usize> Array<T, N> {
     pub fn new() -> Self {
         Array {
-            _array: [T::default(); N],
+            data: [T::default(); N],
         }
+    }
+
+    pub fn from_slice(slice: &[T]) -> Result<Self, TensorError> {
+        if slice.len() != N {
+            return Err(TensorError::DimensionMismatch {
+                expected: N.to_string(),
+                found: slice.len().to_string(),
+                operation: "Array::from_slice".to_string(),
+            });
+        }
+
+        let mut data = [T::default(); N];
+        data.copy_from_slice(slice);
+        Ok(Array { data })
+    }
+
+    pub fn len(&self) -> usize {
+        N
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<T> {
+        self.data.iter()
+    }
+
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<T> {
+        self.data.iter_mut()
     }
 }
 
-impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Matrix<T, N> {
+impl<T: AllowedNumericTypes, const N: usize> Index<usize> for Array<T, N> {
+    type Output = T;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> IndexMut<usize> for Array<T, N> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Add for Array<T, N> {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] + rhs.data[i];
+        }
+        Array { data: result }
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Sub for Array<T, N> {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] - rhs.data[i];
+        }
+        Array { data: result }
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Mul for Array<T, N> {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] * rhs.data[i];
+        }
+        Array { data: result }
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Div for Array<T, N> {
+    type Output = Result<Self, TensorError>;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            if rhs.data[i].is_zero() {
+                return Err(TensorError::DivisionByZero);
+            }
+            result[i] = self.data[i] / rhs.data[i];
+        }
+        Ok(Array { data: result })
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Array<T, N> {
+    pub fn scalar_add(&self, scalar: T) -> Self {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] + scalar;
+        }
+        Array { data: result }
+    }
+
+    pub fn scalar_mul(&self, scalar: T) -> Self {
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] * scalar;
+        }
+        Array { data: result }
+    }
+
+    pub fn scalar_div(&self, scalar: T) -> Result<Self, TensorError> {
+        if scalar.is_zero() {
+            return Err(TensorError::DivisionByZero);
+        }
+
+        let mut result = [T::default(); N];
+        for i in 0..N {
+            result[i] = self.data[i] / scalar;
+        }
+        Ok(Array { data: result })
+    }
+
+    pub fn dot(&self, other: &Self) -> T {
+        let mut sum = T::zero();
+        for i in 0..N {
+            sum = sum + (self.data[i] * other.data[i]);
+        }
+        sum
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
     pub fn new(rows: usize) -> Self {
-        let mut _matrix = Vec::with_capacity(rows);
+        let mut data = Vec::with_capacity(rows);
         for _ in 0..rows {
-            _matrix.push(Array::new());
+            data.push(Array::new());
+        }
+        Matrix { data, rows }
+    }
+
+    pub fn from_arrays(arrays: Vec<Array<T, N>>) -> Self {
+        let rows = arrays.len();
+        Matrix { data: arrays, rows }
+    }
+
+    pub fn shape(&self) -> (usize, usize) {
+        (self.rows, N)
+    }
+
+    pub fn get(&self, row: usize) -> Result<&Array<T, N>, TensorError> {
+        if row >= self.rows {
+            return Err(TensorError::OutOfBounds {
+                index: row.to_string(),
+                size: self.rows.to_string(),
+            });
         }
 
-        Matrix { _matrix }
+        Ok(&self.data[row])
+    }
+
+    pub fn get_mut(&mut self, row: usize) -> Result<&mut Array<T, N>, TensorError> {
+        if row >= self.rows {
+            return Err(TensorError::OutOfBounds {
+                index: row.to_string(),
+                size: self.rows.to_string(),
+            });
+        }
+
+        Ok(&mut self.data[row])
     }
 }
 
-impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Tensor<T, N> {
-    pub fn new(depths: usize, rows: usize) -> Self {
-        let mut _tensor = Vec::with_capacity(depths);
-        for _ in 0..depths {
-            _tensor.push(Matrix::new(rows));
+impl<T: AllowedNumericTypes, const N: usize> Index<usize> for Matrix<T, N> {
+    type Output = Array<T, N>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> IndexMut<usize> for Matrix<T, N> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Add for Matrix<T, N> {
+    type Output = Result<Self, TensorError>;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        if self.rows != rhs.rows {
+            return Err(TensorError::DimensionMismatch {
+                expected: format!("{}x{}", self.rows, N),
+                found: format!("{}x{}", rhs.rows, N),
+                operation: "Matrix addition".to_string(),
+            });
         }
 
-        Tensor { _tensor }
+        let mut result_data = Vec::with_capacity(self.rows);
+        for i in 0..self.rows {
+            result_data.push(self.data[i].clone() + rhs.data[i].clone());
+        }
+
+        Ok(Matrix {
+            data: result_data,
+            rows: self.rows,
+        })
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
+    pub fn scalar_mul(&self, scalar: T) -> Self {
+        let mut result_data = Vec::with_capacity(self.rows);
+        for i in 0..self.rows {
+            result_data.push(self.data[i].scalar_mul(scalar));
+        }
+        Matrix {
+            data: result_data,
+            rows: self.rows,
+        }
+    }
+
+    pub fn mat_vec_mul(&self, vec: &Array<T, N>) -> Result<Vec<T>, TensorError> {
+        let mut result = Vec::with_capacity(self.rows);
+        for i in 0..self.rows {
+            result.push(self.data[i].dot(vec));
+        }
+        Ok(result)
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Tensor<T, N> {
+    pub fn new(depths: usize, rows: usize) -> Self {
+        let mut data = Vec::with_capacity(depths);
+        for _ in 0..depths {
+            data.push(Matrix::new(rows));
+        }
+        Tensor { data, depths, rows }
+    }
+
+    pub fn shape(&self) -> (usize, usize, usize) {
+        (self.depths, self.rows, N)
+    }
+
+    pub fn get(&self, depth: usize) -> Result<&Matrix<T, N>, TensorError> {
+        if depth >= self.depths {
+            return Err(TensorError::OutOfBounds {
+                index: depth.to_string(),
+                size: self.depths.to_string(),
+            });
+        }
+        Ok(&self.data[depth])
+    }
+
+    pub fn get_mut(&mut self, depth: usize) -> Result<&mut Matrix<T, N>, TensorError> {
+        if depth >= self.depths {
+            return Err(TensorError::OutOfBounds {
+                index: depth.to_string(),
+                size: self.depths.to_string(),
+            });
+        }
+        Ok(&mut self.data[depth])
+    }
+
+    pub fn scalar_mul(&self, scalar: T) -> Self {
+        let mut result_data = Vec::with_capacity(self.depths);
+        for i in 0..self.depths {
+            result_data.push(self.data[i].scalar_mul(scalar));
+        }
+        Tensor {
+            data: result_data,
+            depths: self.depths,
+            rows: self.rows,
+        }
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> Index<usize> for Tensor<T, N> {
+    type Output = Matrix<T, N>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.data[index]
+    }
+}
+
+impl<T: AllowedNumericTypes, const N: usize> IndexMut<usize> for Tensor<T, N> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.data[index]
     }
 }

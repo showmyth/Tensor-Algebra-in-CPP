@@ -97,15 +97,6 @@ The library is structured around three core abstractions:
 - **`Matrix<T>`**: Specialized 2D operations with linear algebra support
 - **`Vector<T>`**: 1D operations with vector space operations
 
-## Examples
-
-Check out the `examples/` directory for comprehensive usage examples:
-
-- `basic_operations.rs` - Element-wise operations
-- `linear_algebra.rs` - Matrix operations  
-- `tensor_manipulation.rs` - Higher-dimensional operations
-
-
 ## Documentation
 
 Coming soon!

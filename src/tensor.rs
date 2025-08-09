@@ -16,7 +16,7 @@ pub struct Matrix<T: AllowedNumericTypes, const N: usize> {
 }
 
 pub struct Tensor<T: AllowedNumericTypes, const N: usize> {
-    _matrix: Vec<Matrix<T, N>>,
+    _tensor: Vec<Matrix<T, N>>,
 }
 
 impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Array<T, N> {
@@ -28,16 +28,23 @@ impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Array<T, N> {
 }
 
 impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Matrix<T, N> {
-    pub fn new() -> Self {
-        Array {
-            _array: [T::default(); N],
+    pub fn new(rows: usize) -> Self {
+        let mut _matrix = Vec::with_capacity(rows);
+        for _ in 0..rows {
+            _matrix.push(Array::new());
         }
+
+        Matrix { _matrix }
     }
 }
+
 impl<T: AllowedNumericTypes + Copy + Default, const N: usize> Tensor<T, N> {
-    pub fn new() -> Self {
-        Array {
-            _array: [T::default(); N],
+    pub fn new(depths: usize, rows: usize) -> Self {
+        let mut _tensor = Vec::with_capacity(depths);
+        for _ in 0..depths {
+            _tensor.push(Matrix::new(rows));
         }
+
+        Tensor { _tensor }
     }
 }

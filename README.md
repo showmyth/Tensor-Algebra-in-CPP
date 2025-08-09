@@ -1,6 +1,6 @@
 # Tensor-Algebra-in-Rust
 
-> This is meant to be a personal project between [Sowmith](https://github.com/Sowmith) and [IrregularPersona](https://github.com/IrregularPersona)
+> This is meant to be a personal project between [showmyth](https://github.com/showmyth) and [IrregularPersona](https://github.com/IrregularPersona)
 
 A foundational library for performing basic algebraic operations on N-dimensional numerical data structures (Arrays, Matrices, and Tensors) in Rust.
 

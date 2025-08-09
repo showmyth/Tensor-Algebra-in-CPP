@@ -59,7 +59,7 @@ This project is in active development. Current focus areas:
 - Comprehensive test suite
 - Documentation and examples
 
-## 🤝 Contributing
+## Contributing
 
 **Status**: Pull requests are currently closed while we establish the core architecture.
 

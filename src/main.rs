@@ -1,3 +1,4 @@
+pub mod error;
 mod tensor;
 
 fn main() {

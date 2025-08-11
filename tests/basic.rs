@@ -1,47 +1,48 @@
 use tensor_algebra_in_rust::error::TensorError;
-use tensor_algebra_in_rust::tensor::{Array, Matrix, Tensor};
+use tensor_algebra_in_rust::tensor::{Matrix, Tensor, Vector};
+use tensor_algebra_in_rust::vector;
 
 #[test]
-fn array_elementwise_ops_and_scalar_ops() {
+fn vector_elementwise_ops_and_scalar_ops() {
     type T = i32;
     const N: usize = 3;
 
-    let a = Array::<T, N>::from_slice(&[1, 2, 3]).unwrap();
-    let b = Array::<T, N>::from_slice(&[4, 5, 6]).unwrap();
+    let a = vector![1, 2, 3];
+    let b = vector![4, 5, 6];
 
     // elementwise add, sub, mul
     let c = a + b;
-    assert_eq!(c, Array::<T, N>::from_slice(&[5, 7, 9]).unwrap());
+    assert_eq!(c, vector![5, 7, 9]);
 
-    let d = c - Array::<T, N>::from_slice(&[1, 1, 1]).unwrap();
-    assert_eq!(d, Array::<T, N>::from_slice(&[4, 6, 8]).unwrap());
+    let d = c - vector![1, 1, 1];
+    assert_eq!(d, vector![4, 6, 8]);
 
-    let e = d * Array::<T, N>::from_slice(&[2, 0, 3]).unwrap();
-    assert_eq!(e, Array::<T, N>::from_slice(&[8, 0, 24]).unwrap());
+    let e = d * vector![2, 0, 3];
+    assert_eq!(e, vector![8, 0, 24]);
 
     // scalar ops
     let f = e.scalar_add(1);
-    assert_eq!(f, Array::<T, N>::from_slice(&[9, 1, 25]).unwrap());
+    assert_eq!(f, vector![9, 1, 25]);
 
     let g = f.scalar_mul(2);
-    assert_eq!(g, Array::<T, N>::from_slice(&[18, 2, 50]).unwrap());
+    assert_eq!(g, vector![18, 2, 50]);
 
     let h = g.scalar_div(2).unwrap();
-    assert_eq!(h, Array::<T, N>::from_slice(&[9, 1, 25]).unwrap());
+    assert_eq!(h, vector![9, 1, 25]);
 
     // dot product
-    let x = Array::<T, N>::from_slice(&[1, 2, 3]).unwrap();
-    let y = Array::<T, N>::from_slice(&[4, 5, 6]).unwrap();
+    let x = vector![1, 2, 3];
+    let y = vector![4, 5, 6];
     assert_eq!(x.dot(&y), 32);
 }
 
 #[test]
-fn array_division_by_zero_errors() {
+fn vector_division_by_zero_errors() {
     type T = i32;
     const N: usize = 3;
 
-    let a = Array::<T, N>::from_slice(&[1, 2, 3]).unwrap();
-    let z = Array::<T, N>::from_slice(&[1, 0, 1]).unwrap();
+    let a = vector![1, 2, 3];
+    let z = vector![1, 0, 1];
 
     assert_eq!(a.clone() / z, Err(TensorError::DivisionByZero));
     assert!(a.scalar_div(0).is_err());
@@ -52,28 +53,28 @@ fn matrix_add_and_shape_and_mat_vec_mul() {
     type T = i32;
     const N: usize = 3;
 
-    let m1 = Matrix::<T, N>::from_arrays(vec![
-        Array::from_slice(&[1, 2, 3]).unwrap(),
-        Array::from_slice(&[4, 5, 6]).unwrap(),
+    let m1 = Matrix::<T, N>::from_vectors(vec![
+        vector![1, 2, 3],
+        vector![4, 5, 6],
     ]);
-    let m2 = Matrix::<T, N>::from_arrays(vec![
-        Array::from_slice(&[7, 8, 9]).unwrap(),
-        Array::from_slice(&[10, 11, 12]).unwrap(),
+    let m2 = Matrix::<T, N>::from_vectors(vec![
+        vector![7, 8, 9],
+        vector![10, 11, 12],
     ]);
 
     assert_eq!(m1.shape(), (2, N));
 
     let sum = (m1.clone() + m2.clone()).unwrap();
-    assert_eq!(sum[0], Array::from_slice(&[8, 10, 12]).unwrap());
-    assert_eq!(sum[1], Array::from_slice(&[14, 16, 18]).unwrap());
+    assert_eq!(sum[0], vector![8, 10, 12]);
+    assert_eq!(sum[1], vector![14, 16, 18]);
 
     // matrix-vector multiplication
-    let v = Array::<T, N>::from_slice(&[1, 1, 1]).unwrap();
+    let v = vector![1, 1, 1];
     let res = m1.mat_vec_mul(&v).unwrap();
     assert_eq!(res, vec![6, 15]);
 
     // dimension mismatch error for addition
-    let m3 = Matrix::<T, N>::from_arrays(vec![Array::from_slice(&[0, 0, 0]).unwrap()]);
+    let m3 = Matrix::<T, N>::from_vectors(vec![vector![0, 0, 0]]);
     let err = (m1 + m3).unwrap_err();
     match err {
         TensorError::DimensionMismatch { .. } => {}

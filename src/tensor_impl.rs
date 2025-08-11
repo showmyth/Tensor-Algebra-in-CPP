@@ -76,6 +76,11 @@ impl AllowedNumericTypes for u64 {
 }
 
 // Vector inherent impls and trait impls
+impl<T: AllowedNumericTypes, const N: usize> Default for Vector<T, N> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl<T: AllowedNumericTypes, const N: usize> Vector<T, N> {
     pub fn new() -> Self {
         Vector {
@@ -101,11 +106,15 @@ impl<T: AllowedNumericTypes, const N: usize> Vector<T, N> {
         N
     }
 
-    pub fn iter(&self) -> std::slice::Iter<T> {
+    pub fn is_empty(&self) -> bool {
+        N == 0
+    }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, T> {
         self.data.iter()
     }
 
-    pub fn iter_mut(&mut self) -> std::slice::IterMut<T> {
+    pub fn iter_mut(&mut self) -> std::slice::IterMut<'_, T> {
         self.data.iter_mut()
     }
 }
@@ -134,10 +143,7 @@ impl<T: AllowedNumericTypes, const N: usize> Add for Vector<T, N> {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] + rhs.data[i];
-        }
+        let result = std::array::from_fn(|i| self.data[i] + rhs.data[i]);
         Vector { data: result }
     }
 }
@@ -146,10 +152,7 @@ impl<T: AllowedNumericTypes, const N: usize> Sub for Vector<T, N> {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] - rhs.data[i];
-        }
+        let result = std::array::from_fn(|i| self.data[i] - rhs.data[i]);
         Vector { data: result }
     }
 }
@@ -158,10 +161,7 @@ impl<T: AllowedNumericTypes, const N: usize> Mul for Vector<T, N> {
     type Output = Self;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] * rhs.data[i];
-        }
+        let result = std::array::from_fn(|i| self.data[i] * rhs.data[i]);
         Vector { data: result }
     }
 }
@@ -171,11 +171,11 @@ impl<T: AllowedNumericTypes, const N: usize> Div for Vector<T, N> {
 
     fn div(self, rhs: Self) -> Self::Output {
         let mut result = [T::default(); N];
-        for i in 0..N {
+        for (i, elem) in result.iter_mut().enumerate() {
             if rhs.data[i].is_zero() {
                 return Err(TensorError::DivisionByZero);
             }
-            result[i] = self.data[i] / rhs.data[i];
+            *elem = self.data[i] / rhs.data[i];
         }
         Ok(Vector { data: result })
     }
@@ -183,18 +183,12 @@ impl<T: AllowedNumericTypes, const N: usize> Div for Vector<T, N> {
 
 impl<T: AllowedNumericTypes, const N: usize> Vector<T, N> {
     pub fn scalar_add(&self, scalar: T) -> Self {
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] + scalar;
-        }
+        let result = std::array::from_fn(|i| self.data[i] + scalar);
         Vector { data: result }
     }
 
     pub fn scalar_mul(&self, scalar: T) -> Self {
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] * scalar;
-        }
+        let result = std::array::from_fn(|i| self.data[i] * scalar);
         Vector { data: result }
     }
 
@@ -203,10 +197,7 @@ impl<T: AllowedNumericTypes, const N: usize> Vector<T, N> {
             return Err(TensorError::DivisionByZero);
         }
 
-        let mut result = [T::default(); N];
-        for i in 0..N {
-            result[i] = self.data[i] / scalar;
-        }
+        let result = std::array::from_fn(|i| self.data[i] / scalar);
         Ok(Vector { data: result })
     }
 
@@ -231,7 +222,10 @@ impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
 
     pub fn from_vectors(vectors: Vec<Vector<T, N>>) -> Self {
         let rows = vectors.len();
-        Matrix { data: vectors, rows }
+        Matrix {
+            data: vectors,
+            rows,
+        }
     }
 
     pub fn shape(&self) -> (usize, usize) {
@@ -380,4 +374,3 @@ impl<T: AllowedNumericTypes, const N: usize> IndexMut<usize> for Tensor<T, N> {
         &mut self.data[index]
     }
 }
-

@@ -30,4 +30,3 @@ fn main() {
     println!("Matrix B\n{}", format_matrix(&b));
     println!("A * B\n{}", format_matrix(&c));
 }
-

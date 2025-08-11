@@ -1,6 +1,6 @@
 use std::fmt::Display;
-use tensor_algebra_in_rust::{matrix, vector};
 use tensor_algebra_in_rust::tensor::{AllowedNumericTypes, Matrix, Vector};
+use tensor_algebra_in_rust::{matrix, vector};
 
 fn format_array<T: Display + AllowedNumericTypes, const N: usize>(a: &Vector<T, N>) -> String {
     let elems: Vec<String> = a.iter().map(|x| format!("{}", x)).collect();
@@ -34,6 +34,5 @@ fn main() {
     println!("Matrix b\n{}", format_matrix(&b));
     println!("a + b\n{}", format_matrix(&sum));
     println!("2 * a\n{}", format_matrix(&scaled));
-    println!("a * [1, 0, -1]^T = {:?}", mv);
+    println!("a * [1, -1]^T = {:?}", mv);
 }
-

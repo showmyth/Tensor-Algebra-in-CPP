@@ -101,9 +101,9 @@ The library is structured around three core abstractions:
 
 Check out the `examples/` directory for comprehensive usage examples:
 
-- `basic_operations.rs` - Element-wise operations
-- `linear_algebra.rs` - Matrix operations  
-- `tensor_manipulation.rs` - Higher-dimensional operations
+- `arrays_basics.rs` 
+- `matmul_basics.rs` 
+- `matrices_basics.rs` 
 
 
 ## Documentation

@@ -305,6 +305,47 @@ impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
         }
     }
 
+
+    pub fn transpose(&self) -> Result<Vec<Vec<T>>, TensorError> {
+        let mut result = Vec::with_capacity(N); //to return N columns
+        for i in 0..N {
+            let mut column = Vec::with_capacity(self.rows); //stores the row values in column vec
+            for j in 0..self.rows {
+                column.push(self.data[j][i]); //pushes the result (each row element) to the column
+            }
+            result.push(column);
+        }
+        Ok(result)
+    }
+
+
+    pub fn swap_rows(&mut self, row1: usize, row2: usize) -> Result<(), TensorError> {
+        if row1 >= self.rows {
+            println!("Array out of bounds!");
+            return Err(TensorError::OutOfBounds{
+                index: row1.to_string(),
+                size: self.rows.to_string(),
+            });
+        }
+
+        if row2 >= self.rows {
+            println!("Array out of bounds!");
+            return Err(TensorError::OutOfBounds{
+                index: row2.to_string(),
+                size: self.rows.to_string(),
+            });
+        }
+
+        for j in 0..N {
+            let i1 = row1 * N + j;
+            let i2 = row2 * N + j;
+            self.data.swap(i1,i2);
+        }
+        
+        Ok(())
+    }
+
+
     pub fn mat_vec_mul(&self, vec: &Vector<T, N>) -> Result<Vec<T>, TensorError> {
         let mut result = Vec::with_capacity(self.rows);
         for i in 0..self.rows {
@@ -313,6 +354,9 @@ impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
         Ok(result)
     }
 }
+
+
+
 
 // Tensor impls and trait impls
 impl<T: AllowedNumericTypes, const N: usize> Tensor<T, N> {
@@ -360,6 +404,8 @@ impl<T: AllowedNumericTypes, const N: usize> Tensor<T, N> {
         }
     }
 }
+
+
 
 impl<T: AllowedNumericTypes, const N: usize> Index<usize> for Tensor<T, N> {
     type Output = Matrix<T, N>;

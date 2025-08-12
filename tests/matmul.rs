@@ -1,5 +1,5 @@
 use tensor_algebra_in_rust::error::TensorError;
-use tensor_algebra_in_rust::tensor::{Matrix, Vector};
+use tensor_algebra_in_rust::tensor::Matrix;
 use tensor_algebra_in_rust::vector;
 
 #[test]
@@ -49,4 +49,3 @@ fn matrix_matmul_f64_kahan_stability_sanity() {
     let val = c[0][0];
     assert!(val.abs() < 1e-6, "expected ~0, got {}", val);
 }
-

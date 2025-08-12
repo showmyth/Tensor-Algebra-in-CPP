@@ -1,12 +1,9 @@
 use tensor_algebra_in_rust::error::TensorError;
-use tensor_algebra_in_rust::tensor::{Matrix, Tensor, Vector};
+use tensor_algebra_in_rust::tensor::{Matrix, Tensor};
 use tensor_algebra_in_rust::vector;
 
 #[test]
 fn vector_elementwise_ops_and_scalar_ops() {
-    type T = i32;
-    const N: usize = 3;
-
     let a = vector![1, 2, 3];
     let b = vector![4, 5, 6];
 
@@ -38,9 +35,6 @@ fn vector_elementwise_ops_and_scalar_ops() {
 
 #[test]
 fn vector_division_by_zero_errors() {
-    type T = i32;
-    const N: usize = 3;
-
     let a = vector![1, 2, 3];
     let z = vector![1, 0, 1];
 
@@ -50,19 +44,10 @@ fn vector_division_by_zero_errors() {
 
 #[test]
 fn matrix_add_and_shape_and_mat_vec_mul() {
-    type T = i32;
-    const N: usize = 3;
+    let m1 = Matrix::<i32, 3>::from_vectors(vec![vector![1, 2, 3], vector![4, 5, 6]]);
+    let m2 = Matrix::<i32, 3>::from_vectors(vec![vector![7, 8, 9], vector![10, 11, 12]]);
 
-    let m1 = Matrix::<T, N>::from_vectors(vec![
-        vector![1, 2, 3],
-        vector![4, 5, 6],
-    ]);
-    let m2 = Matrix::<T, N>::from_vectors(vec![
-        vector![7, 8, 9],
-        vector![10, 11, 12],
-    ]);
-
-    assert_eq!(m1.shape(), (2, N));
+    assert_eq!(m1.shape(), (2, 3));
 
     let sum = (m1.clone() + m2.clone()).unwrap();
     assert_eq!(sum[0], vector![8, 10, 12]);
@@ -74,7 +59,7 @@ fn matrix_add_and_shape_and_mat_vec_mul() {
     assert_eq!(res, vec![6, 15]);
 
     // dimension mismatch error for addition
-    let m3 = Matrix::<T, N>::from_vectors(vec![vector![0, 0, 0]]);
+    let m3 = Matrix::<i32, 3>::from_vectors(vec![vector![0, 0, 0]]);
     let err = (m1 + m3).unwrap_err();
     match err {
         TensorError::DimensionMismatch { .. } => {}
@@ -84,16 +69,12 @@ fn matrix_add_and_shape_and_mat_vec_mul() {
 
 #[test]
 fn tensor_scalar_mul_and_shape_and_bounds() {
-    type T = i32;
-    const N: usize = 2;
-
-    let t = Tensor::<T, N>::new(2, 3);
-    assert_eq!(t.shape(), (2, 3, N));
+    let t = Tensor::<i32, 2>::new(2, 3);
+    assert_eq!(t.shape(), (2, 3, 2));
 
     let t2 = t.scalar_mul(2);
-    assert_eq!(t2.shape(), (2, 3, N));
+    assert_eq!(t2.shape(), (2, 3, 2));
 
     // out of bounds check
     assert!(t.get(2).is_err());
 }
-

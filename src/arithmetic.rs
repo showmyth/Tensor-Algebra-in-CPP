@@ -37,8 +37,8 @@ fn mat_mul_impl<T: AllowedNumericTypes, const N: usize, const M: usize>(
     Ok(result)
 }
 
-impl<'a, 'b, T: AllowedNumericTypes, const N: usize, const M: usize> Mul<&'b Matrix<T, M>>
-    for &'a Matrix<T, N>
+impl<'b, T: AllowedNumericTypes, const N: usize, const M: usize> Mul<&'b Matrix<T, M>>
+    for &Matrix<T, N>
 {
     type Output = Result<Matrix<T, M>, TensorError>;
 
@@ -47,9 +47,7 @@ impl<'a, 'b, T: AllowedNumericTypes, const N: usize, const M: usize> Mul<&'b Mat
     }
 }
 
-impl<'a, T: AllowedNumericTypes, const N: usize, const M: usize> Mul<Matrix<T, M>>
-    for &'a Matrix<T, N>
-{
+impl<T: AllowedNumericTypes, const N: usize, const M: usize> Mul<Matrix<T, M>> for &Matrix<T, N> {
     type Output = Result<Matrix<T, M>, TensorError>;
 
     fn mul(self, rhs: Matrix<T, M>) -> Self::Output {
@@ -74,4 +72,3 @@ impl<T: AllowedNumericTypes, const N: usize, const M: usize> Mul<Matrix<T, M>> f
         mat_mul_impl(&self, &rhs)
     }
 }
-

@@ -20,4 +20,3 @@ macro_rules! matrix {
         $crate::tensor::Matrix::from_vectors(rows_vec)
     }};
 }
-

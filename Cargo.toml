@@ -2,5 +2,8 @@
 name = "tensor-algebra-in-rust"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/showmyth/Tensor-Algebra-in-Rust"
 
 [dependencies]

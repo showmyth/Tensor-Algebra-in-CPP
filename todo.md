@@ -9,9 +9,9 @@
 - [X] Add crate metadata in `Cargo.toml`: `description`, `license = "MIT"`, `repository`, `readme = "README.md"`, `keywords`, `categories`.
 - [X] `rustfmt` + `clippy -D warnings` clean.
 - [X] Implement `Display` for `Vector/Matrix/Tensor`.
-- [ ] Add `Index<(usize, usize)>` for `Matrix` and helpers `get(row, col)` / `get_mut(row, col)`.
+- [X] Add `Index<(usize, usize)>` for `Matrix` and helpers `get(row, col)` / `get_mut(row, col)`.
 - [X] Add `prelude` module re-exports (types + macros).
-- [ ] Module docs + doctests for `tensor`, `arithmetic`, `macros`.
+- [X] Module docs + doctests for `tensor`, `arithmetic`, `macros`.
 
 ### P0 — Core API additions
 - [X] `Matrix::transpose()` (allocating; view-based later).

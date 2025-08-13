@@ -1,3 +1,23 @@
+//! This module provides the implementation for matrix multiplication.
+//!
+//! It includes a generic `mat_mul_impl` function that performs the multiplication
+//! with Kahan summation for improved numerical stability, and `Mul` trait
+//! implementations for various combinations of owned and borrowed matrices.
+//!
+//! # Examples
+//!
+//! ```
+//! use tensor_lib::matrix;
+//!
+//! let a = matrix![[1.0, 2.0]; [3.0, 4.0]];
+//! let b = matrix![[5.0, 6.0]; [7.0, 8.0]];
+//!
+//! let c = &a * &b;
+//!
+//! let expected = matrix![[19.0, 22.0]; [43.0, 50.0]];
+//!
+//! assert_eq!(c.unwrap(), expected);
+//! ```
 use crate::error::TensorError;
 use crate::types::{AllowedNumericTypes, Matrix};
 use std::ops::Mul;

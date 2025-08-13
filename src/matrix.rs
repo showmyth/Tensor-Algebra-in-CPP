@@ -101,7 +101,10 @@ impl<T: AllowedNumericTypes, const N: usize> Add for Matrix<T, N> {
 
 impl<T: AllowedNumericTypes, const N: usize> Matrix<T, N> {
     pub fn sum(&self) -> T {
-        self.data.iter().map(|row| row.sum()).fold(T::zero(), |acc, x| acc + x)
+        self.data
+            .iter()
+            .map(|row| row.sum())
+            .fold(T::zero(), |acc, x| acc + x)
     }
 
     pub fn mean(&self) -> T

@@ -1,5 +1,5 @@
 use crate::error::TensorError;
-use crate::tensor::{AllowedNumericTypes, Matrix};
+use crate::types::{AllowedNumericTypes, Matrix};
 use std::ops::Mul;
 
 fn mat_mul_impl<T: AllowedNumericTypes, const N: usize, const M: usize>(

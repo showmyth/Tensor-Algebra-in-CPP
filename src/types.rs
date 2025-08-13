@@ -22,6 +22,7 @@ pub trait AllowedNumericTypes:
     + Mul<Output = Self>
     + Div<Output = Self>
     + PartialEq
+    + PartialOrd
     + std::fmt::Debug
 {
     /// Additive identity value.
@@ -33,6 +34,8 @@ pub trait AllowedNumericTypes:
     /// Note: for floating-point types this uses exact comparison.
     /// If you need epsilon-based comparisons, add that at call sites.
     fn is_zero(&self) -> bool;
+    fn abs(self) -> Self;
+    fn from_f64(n: f64) -> Option<Self>;
 }
 
 // Implementations for primitive numeric types are provided in `tensor_impl.rs`.

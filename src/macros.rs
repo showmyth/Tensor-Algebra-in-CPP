@@ -4,7 +4,7 @@ macro_rules! vector {
     ( $($x:expr),+ $(,)? ) => {{
         let tmp = [ $( $x ),+ ];
         // Infer T and N from the vector literal
-        $crate::tensor::Vector::from(tmp)
+        $crate::types::Vector::from(tmp)
     }};
 }
 
@@ -13,10 +13,10 @@ macro_rules! matrix {
     // matrix![ [a, b]; [c, d] ] or matrix![ a, b; c, d ]
     ( $( [ $($x:expr),* $(,)? ] );+ $(;)? ) => {{
         let rows_vec = vec![ $( $crate::vector![ $( $x ),* ] ),+ ];
-        $crate::tensor::Matrix::from_vectors(rows_vec)
+        $crate::types::Matrix::from_vectors(rows_vec)
     }};
     ( $( $($x:expr),+ );+ $(;)? ) => {{
         let rows_vec = vec![ $( $crate::vector![ $($x),+ ] ),+ ];
-        $crate::tensor::Matrix::from_vectors(rows_vec)
+        $crate::types::Matrix::from_vectors(rows_vec)
     }};
 }

@@ -1,9 +1,7 @@
-use tensor_algebra_in_rust::error::TensorError;
-use tensor_algebra_in_rust::tensor::Matrix;
-use tensor_algebra_in_rust::vector;
+use tensor_algebra_in_rust::{matrix, prelude::*, vector};
 
 #[test]
-fn matrix_matmul_i32_basic() {
+fn i32_basic() {
     // A: 2x3
     let a = Matrix::<i32, 3>::from_vectors(vec![vector![1, 2, 3], vector![4, 5, 6]]);
 
@@ -17,7 +15,7 @@ fn matrix_matmul_i32_basic() {
 }
 
 #[test]
-fn matrix_matmul_dimension_mismatch() {
+fn dimension_mismatch() {
     // A: 2x3
     let a = Matrix::<i32, 3>::from_vectors(vec![vector![1, 2, 3], vector![4, 5, 6]]);
 
@@ -32,7 +30,7 @@ fn matrix_matmul_dimension_mismatch() {
 }
 
 #[test]
-fn matrix_matmul_f64_kahan_stability_sanity() {
+fn f64_kahan_stability_sanity() {
     // Construct a case with catastrophic cancellation if summed naively:
     // [1e16, 1, 1, -1e16] dot [1, 1, -1, 1] = 0
     let a = Matrix::<f64, 4>::from_vectors(vec![vector![1e16, 1.0, 1.0, -1e16]]); // 1x4
